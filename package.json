@@ -1,0 +1,34 @@
+{
+  "name": "button-styles",
+  "version": "1.0.0",
+  "description": "Modular CSS button styles",
+  "main": "index.js",
+  "scripts": {
+    "start": "wzrd example.js -- -t csjs-injectify"
+  },
+  "author": "Kyle Robinson Young <kyle@dontkry.com> (http://dontkry.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shama/button-styles"
+  },
+  "keywords": [
+    "css",
+    "stylesheet",
+    "style",
+    "csjs",
+    "button"
+  ],
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "color": "^0.11.1",
+    "csjs": "^1.0.1"
+  },
+  "devDependencies": {
+    "csjs-injectify": "^1.0.0",
+    "wzrd": "^1.3.1",
+    "yo-yo": "^1.1.1"
+  }
+}
