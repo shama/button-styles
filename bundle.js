@@ -1,7 +1,7 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var btn = require('./index.js')
 var yo = require('yo-yo')
-var csjs = require('csjs')
+var csjs = require('csjs-injectify/csjs-inject')
 
 var buttons = [
   'Default', 'Primary', 'Warning', 'Danger', 'Info', 'Disabled'
@@ -32,8 +32,8 @@ var demo = yo`<div class="${style.demo}">
 
 document.body.appendChild(demo)
 
-},{"./index.js":2,"csjs":10,"yo-yo":21}],2:[function(require,module,exports){
-var csjs = require('csjs')
+},{"./index.js":2,"csjs-injectify/csjs-inject":8,"yo-yo":26}],2:[function(require,module,exports){
+var csjs = require('csjs-injectify/csjs-inject')
 var color = require('color')
 
 var opts = {
@@ -103,7 +103,7 @@ ${types.map(function (type) {
 }
 `
 
-},{"color":3,"csjs":10}],3:[function(require,module,exports){
+},{"color":3,"csjs-injectify/csjs-inject":8}],3:[function(require,module,exports){
 /* MIT license */
 var convert = require('color-convert');
 var string = require('color-string');
@@ -1722,14 +1722,33 @@ module.exports = {
 },{}],8:[function(require,module,exports){
 'use strict';
 
-module.exports = require('./lib/csjs');
+module.exports = require('csjs-inject');
 
-},{"./lib/csjs":14}],9:[function(require,module,exports){
+},{"csjs-inject":11}],9:[function(require,module,exports){
+(function (global){
 'use strict';
 
-module.exports = require('./lib/get-css');
+var csjs = require('csjs');
+var insertCss = require('insert-css');
 
-},{"./lib/get-css":17}],10:[function(require,module,exports){
+function csjsInserter() {
+  var args = Array.prototype.slice.call(arguments);
+  var result = csjs.apply(null, args);
+  if (global.document) {
+    insertCss(csjs.getCss(result));
+  }
+  return result;
+}
+
+module.exports = csjsInserter;
+
+}).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"csjs":15,"insert-css":12}],10:[function(require,module,exports){
+'use strict';
+
+module.exports = require('csjs/get-css');
+
+},{"csjs/get-css":14}],11:[function(require,module,exports){
 'use strict';
 
 var csjs = require('./csjs');
@@ -1738,7 +1757,43 @@ module.exports = csjs;
 module.exports.csjs = csjs;
 module.exports.getCss = require('./get-css');
 
-},{"./csjs":8,"./get-css":9}],11:[function(require,module,exports){
+},{"./csjs":9,"./get-css":10}],12:[function(require,module,exports){
+var inserted = {};
+
+module.exports = function (css, options) {
+    if (inserted[css]) return;
+    inserted[css] = true;
+    
+    var elem = document.createElement('style');
+    elem.setAttribute('type', 'text/css');
+
+    if ('textContent' in elem) {
+      elem.textContent = css;
+    } else {
+      elem.styleSheet.cssText = css;
+    }
+    
+    var head = document.getElementsByTagName('head')[0];
+    if (options && options.prepend) {
+        head.insertBefore(elem, head.childNodes[0]);
+    } else {
+        head.appendChild(elem);
+    }
+};
+
+},{}],13:[function(require,module,exports){
+'use strict';
+
+module.exports = require('./lib/csjs');
+
+},{"./lib/csjs":19}],14:[function(require,module,exports){
+'use strict';
+
+module.exports = require('./lib/get-css');
+
+},{"./lib/get-css":22}],15:[function(require,module,exports){
+arguments[4][11][0].apply(exports,arguments)
+},{"./csjs":13,"./get-css":14}],16:[function(require,module,exports){
 'use strict';
 
 /**
@@ -1760,7 +1815,7 @@ module.exports = function encode(integer) {
   return str;
 };
 
-},{}],12:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 var makeComposition = require('./composition').makeComposition;
@@ -1804,7 +1859,7 @@ function getClassChain(obj) {
   return acc;
 }
 
-},{"./composition":13}],13:[function(require,module,exports){
+},{"./composition":18}],18:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -1872,7 +1927,7 @@ function isComposition(value) {
  */
 function Composition() {}
 
-},{}],14:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict';
 
 var extractExtends = require('./css-extract-extends');
@@ -1952,7 +2007,7 @@ function without(obj, unwanted) {
   }, {});
 }
 
-},{"./build-exports":12,"./composition":13,"./css-extract-extends":15,"./css-key":16,"./scopeify":20}],15:[function(require,module,exports){
+},{"./build-exports":17,"./composition":18,"./css-extract-extends":20,"./css-key":21,"./scopeify":25}],20:[function(require,module,exports){
 'use strict';
 
 var makeComposition = require('./composition').makeComposition;
@@ -2005,7 +2060,7 @@ function getClassName(str) {
   return trimmed[0] === '.' ? trimmed.substr(1) : trimmed;
 }
 
-},{"./composition":13}],16:[function(require,module,exports){
+},{"./composition":18}],21:[function(require,module,exports){
 'use strict';
 
 /**
@@ -2015,7 +2070,7 @@ function getClassName(str) {
 
 module.exports = ' css ';
 
-},{}],17:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict';
 
 var cssKey = require('./css-key');
@@ -2024,7 +2079,7 @@ module.exports = function getCss(csjs) {
   return csjs[cssKey];
 };
 
-},{"./css-key":16}],18:[function(require,module,exports){
+},{"./css-key":21}],23:[function(require,module,exports){
 'use strict';
 
 /**
@@ -2042,7 +2097,7 @@ module.exports = function hashStr(str) {
   return hash >>> 0;
 };
 
-},{}],19:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 var encode = require('./base62-encode');
@@ -2056,7 +2111,7 @@ module.exports = function fileScoper(fileSrc) {
   }
 };
 
-},{"./base62-encode":11,"./hash-string":18}],20:[function(require,module,exports){
+},{"./base62-encode":16,"./hash-string":23}],25:[function(require,module,exports){
 'use strict';
 
 var fileScoper = require('./scoped-name');
@@ -2126,7 +2181,7 @@ function replaceAnimations(result) {
   return result;
 }
 
-},{"./scoped-name":19}],21:[function(require,module,exports){
+},{"./scoped-name":24}],26:[function(require,module,exports){
 var bel = require('bel') // turns template tag into DOM elements
 var morphdom = require('morphdom') // efficiently diffs + morphs two DOM elements
 var defaultEvents = require('./update-events.js') // default events to be copied when dom elements update
@@ -2157,7 +2212,7 @@ module.exports.update = function (fromNode, toNode, opts) {
   }
 }
 
-},{"./update-events.js":27,"bel":22,"morphdom":26}],22:[function(require,module,exports){
+},{"./update-events.js":32,"bel":27,"morphdom":31}],27:[function(require,module,exports){
 var document = require('global/document')
 var hyperx = require('hyperx')
 
@@ -2274,7 +2329,7 @@ function belCreateElement (tag, props, children) {
 module.exports = hyperx(belCreateElement)
 module.exports.createElement = belCreateElement
 
-},{"global/document":23,"hyperx":24}],23:[function(require,module,exports){
+},{"global/document":28,"hyperx":29}],28:[function(require,module,exports){
 (function (global){
 var topLevel = typeof global !== 'undefined' ? global :
     typeof window !== 'undefined' ? window : {}
@@ -2293,7 +2348,7 @@ if (typeof document !== 'undefined') {
 }
 
 }).call(this,typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"min-document":28}],24:[function(require,module,exports){
+},{"min-document":33}],29:[function(require,module,exports){
 var attrToProp = require('hyperscript-attribute-to-property')
 
 var VAR = 0, TEXT = 1, OPEN = 2, CLOSE = 3, ATTR = 4
@@ -2558,7 +2613,7 @@ var closeRE = RegExp('^(' + [
 ].join('|') + ')(?:[\.#][a-zA-Z0-9\u007F-\uFFFF_:-]+)*$')
 function selfClosing (tag) { return closeRE.test(tag) }
 
-},{"hyperscript-attribute-to-property":25}],25:[function(require,module,exports){
+},{"hyperscript-attribute-to-property":30}],30:[function(require,module,exports){
 module.exports = attributeToProperty
 
 var transform = {
@@ -2579,7 +2634,7 @@ function attributeToProperty (h) {
   }
 }
 
-},{}],26:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 // Create a range object for efficently rendering strings to elements.
 var range;
 
@@ -3065,7 +3120,7 @@ function morphdom(fromNode, toNode, options) {
 
 module.exports = morphdom;
 
-},{}],27:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports = [
   // attribute events (can be set with attributes)
   'onclick',
@@ -3102,6 +3157,6 @@ module.exports = [
   'onfocusout'
 ]
 
-},{}],28:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 
 },{}]},{},[1])
