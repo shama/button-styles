@@ -2,6 +2,8 @@
 
 ![example](https://raw.githubusercontent.com/shama/button-styles/master/example.png)
 
+> Inspired by http://designmodo.github.io/Flat-UI/
+
 ## install
 
 ```shell
