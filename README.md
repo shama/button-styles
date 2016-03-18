@@ -2,6 +2,12 @@
 
 ![example](https://raw.githubusercontent.com/shama/button-styles/master/example.png)
 
+## install
+
+```shell
+npm install button-styles --save
+```
+
 ## usage
 
 ```js
